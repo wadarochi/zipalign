@@ -17,17 +17,18 @@ func main() {
 	var help = flag.Bool("h", false, "Print this help")
 	flag.Parse()
 
-	if flag.NArg() != 2 {
-		log.Fatalf("We need input file & output file")
-	}
-
-	var inputFile = flag.Arg(0)
-	var outputFile = flag.Arg(1)
-
-	if inputFile == "" || outputFile == "" || *help {
+	if *help {
 		flag.PrintDefaults()
-		os.Exit(1)
+		os.Exit(0)
 	}
+
+	if flag.NArg() != 3 {
+		log.Fatalf("We need input file & output file as argument")
+	}
+
+	var inputFile = flag.Arg(1)
+	var outputFile = flag.Arg(2)
+
 	if inputFile == outputFile && !*overwrite {
 		log.Fatalf("Refusing to overwrite output file %q without -f being set", outputFile)
 	}
