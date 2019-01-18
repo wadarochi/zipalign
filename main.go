@@ -13,24 +13,29 @@ func main() {
 	var bias int
 	var verbose = flag.Bool("v", false, "Verbose output")
 	var alignment = flag.Int("a", 4, "Alignment in bytes, e.g. '4' provides 32-bit alignment")
-	var inputFile = flag.String("i", "", "Input ZIP file to be aligned")
-	var outputFile = flag.String("o", "", "Output aligned ZIP file")
 	var overwrite = flag.Bool("f", false, "Overwrite existing outfile.zip")
 	var help = flag.Bool("h", false, "Print this help")
 	flag.Parse()
 
-	if *inputFile == "" || *outputFile == "" || *help {
+	if flag.NArg() != 2 {
+		log.Fatalf("We need input file & output file")
+	}
+
+	var inputFile = flag.Arg(0)
+	var outputFile = flag.Arg(1)
+
+	if inputFile == "" || outputFile == "" || *help {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	if *inputFile == *outputFile && !*overwrite {
-		log.Fatalf("Refusing to overwrite output file %q without -f being set", *outputFile)
+	if inputFile == outputFile && !*overwrite {
+		log.Fatalf("Refusing to overwrite output file %q without -f being set", outputFile)
 	}
 	if *verbose {
-		log.Printf("Aligning %q on %d bytes and writing out to %q", *inputFile, *alignment, *outputFile)
+		log.Printf("Aligning %q on %d bytes and writing out to %q", inputFile, *alignment, outputFile)
 	}
 	// Open a zip archive for reading.
-	r, err := zip.OpenReader(*inputFile)
+	r, err := zip.OpenReader(inputFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -99,7 +104,7 @@ func main() {
 	}
 
 	// Write the aligned zip file
-	err = ioutil.WriteFile(*outputFile, buf.Bytes(), 0744)
+	err = ioutil.WriteFile(outputFile, buf.Bytes(), 0744)
 	if err != nil {
 		log.Fatal(err)
 	}
